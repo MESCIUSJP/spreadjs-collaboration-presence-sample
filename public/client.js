@@ -10,21 +10,11 @@ import { Presence } from "@mescius/js-collaboration-presence-client";
 // ライセンスの設定
 //GC.Spread.Sheets.LicenseKey = 'ここにSpreadJSの共同編集機能が有効なライセンスキーを設定します';
 
-const BrowsingMode = GC.Spread.Sheets.Collaboration.BrowsingMode;
 const mockUsers = [
-  { id: '0', name: "User1", color: "#0000ff", mode: 'edit' },
-  { id: '1', name: "User2", color: '#008000', mode: 'edit' },
-  { id: '2', name: "User3", color: '#9900cc', mode: 'edit' },
+  { id: '0', name: "User1", color: "#0000ff"},
+  { id: '1', name: "User2", color: '#008000'},
+  { id: '2', name: "User3", color: '#9900cc'},
 ];
-const getUser = (id) => {
-  const user = mockUsers.find(u => u.id === id);
-  return {
-    ...user,
-    permission: {
-      mode: user.mode === 'edit' ? BrowsingMode.edit : BrowsingMode.view,
-    }
-  }
-}
 
 // typeを登録
 OT.TypesManager.register(type);
@@ -40,23 +30,12 @@ window.onload = async () => {
   const sheet = workbook.getActiveSheet();
   sheet.zoom(1.6);
 
-  // モックユーザー
-  let userId = '';
-  switch(window.frameElement.id){
-    case 'iframe1':
-      userId = '0';
-      break;
-    case 'iframe2':
-      userId = '1';
-      break;
-    case 'iframe3':
-      userId = '2';
-      break;
-  }
-  const user = getUser(`${userId}`);
+  // モックユーザー（iframe1〜3 に User1〜3 を割り当て）
+  const index = ['iframe1', 'iframe2', 'iframe3'].indexOf(window.frameElement.id);
+  const user = mockUsers[index];
 
-  // サーバーに接続してルームに参加し、ユーザーIDを使用してauthを追加
-  const conn = new Client().connect('room1', { auth: { token: user.id } });
+  // サーバーに接続してルームに参加
+  const conn = new Client().connect('room1');
   const doc = new OT.SharedDoc(conn);
 
   // プレゼンスを作成してバインド
